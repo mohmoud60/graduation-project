@@ -3,35 +3,20 @@ var KTModalCustomersAdd = function () {
     var t, e, o, n, r, i;
     return {
         init: function () {
-            i = new bootstrap.Modal(document.querySelector("#add_TraderTable")),
-                r = document.querySelector("#add_TraderTable_form"),
-                t = r.querySelector("#add_TraderTable_submit"),
-                e = r.querySelector("#add_TraderTable_cancel"),
-                o = r.querySelector("#add_TraderTable_close"),
+            i = new bootstrap.Modal(document.querySelector("#add_rulesTable")),
+                r = document.querySelector("#add_rulesTable_form"),
+                t = r.querySelector("#add_rulesTable_submit"),
+                e = r.querySelector("#add_rulesTable_cancel"),
                 n = FormValidation.formValidation(r, {
                     fields: {
-                        customer_name: {
+                        sidebar_name: {
                             validators: {
-                                notEmpty: { message: "اسم الزبون مطلوب" }
+                                notEmpty: { message: "اسم الصلاحية مطلوب" }
                             }
                         },
-                        customer_address: {
+                        sidebar_pages: {
                             validators: {
-                                notEmpty: { message: "عنوان الزبون مطلوب" }
-                            }
-                        },
-                        customer_phone: {
-                            validators: {
-                                notEmpty: { message: "رقم هاتف الزبون مطلوب" },
-                                regexp: {
-                                    regexp: /^[0-9]+$/,
-                                    message: "يرجى إدخال رقم الهاتف باستخدام الأرقام الإنجليزية فقط"
-                                }
-                            }
-                        },                        
-                        type_id: {
-                            validators: {
-                                notEmpty: { message: "فئة حساب الزبون مطلوب" }
+                                notEmpty: { message: "رابط صفحة الصلاحية مطلوب" }
                             }
                         },
                     },
@@ -54,10 +39,9 @@ var KTModalCustomersAdd = function () {
                             t.disabled = !0;
                         // Gather form data
                         var formData = new FormData(r);
-
                         // AJAX request
                         $.ajax({
-                            url: 'assets/php/process_customer.php?action=add_customer',
+                            url: 'assets/php/process_roles.php?action=sidebar_roles',
                             type: 'POST',
                             data: formData,
                             processData: false,  // Important!
@@ -135,12 +119,7 @@ var KTModalCustomersAdd = function () {
                             }
                         })
                     }))
-            })),
-                o.addEventListener("click", (function () {
-                    r.reset(),
-                        n && n.resetForm(),
-                        i.hide()
-                }))
+            }))
         }
     }
 }();
