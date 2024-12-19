@@ -1,4 +1,5 @@
 <?php
+$required_permission = 'permission_1';
 include 'session_check.php';
 include 'assets/php/connection.php';
 
@@ -14,8 +15,25 @@ $stmt2 = $conn->prepare($query2);
 $stmt2->execute();
 $total_transactions = $stmt2->fetch(PDO::FETCH_ASSOC)['total_transactions'];
 
-// استعلام لجلب الرصيد المتوفر
-$query3 = "SELECT SUM(account_amount) AS total_balance FROM accounting WHERE Delete_Date IS NULL AND currency_id = '001'";
+$query3 = "
+    SELECT 
+        SUM(CASE 
+                WHEN currency_id = '001' AND account_type LIKE '3200%' THEN account_amount
+                WHEN currency_id = '005' AND account_type LIKE '3200%' THEN account_amount / (
+                    SELECT sell_rate 
+                    FROM exchange_rates 
+                    WHERE currency_ex = '10100_10101' 
+                    LIMIT 1
+                )
+                ELSE 0
+            END
+        ) AS total_balance
+    FROM accounting
+    WHERE Delete_Date IS NULL
+      AND (currency_id = '001' OR currency_id = '005');
+";
+
+// تحضير وتنفيذ الاستعلام
 $stmt3 = $conn->prepare($query3);
 $stmt3->execute();
 $total_balance = $stmt3->fetch(PDO::FETCH_ASSOC)['total_balance'];
@@ -25,6 +43,60 @@ $query4 = "SELECT COUNT(*) AS total_customers FROM customer WHERE Delete_Date IS
 $stmt4 = $conn->prepare($query4);
 $stmt4->execute();
 $total_customers = $stmt4->fetch(PDO::FETCH_ASSOC)['total_customers'];
+
+
+$query5 = "
+        SELECT 
+            SUM(
+                CASE 
+                    WHEN a.account_number = '10100' THEN a.account_amount
+                    ELSE a.account_amount / er.sell_rate
+                END
+            ) AS total_in_usd
+        FROM 
+            accounting a
+        LEFT JOIN 
+            exchange_rates er
+        ON 
+            er.currency_ex = CONCAT('10100_', a.account_number)
+        WHERE 
+            a.account_type = 3000
+            AND a.Delete_Date IS NULL;
+    ";
+
+    $stmt5 = $conn->prepare($query5);
+    $stmt5->execute();
+
+    $result = $stmt5->fetch(PDO::FETCH_ASSOC);
+    $total_in_usd = $result['total_in_usd'];
+
+
+    $query6 = "
+        SELECT 
+            SUM(CASE WHEN currency_id = '001' THEN account_amount ELSE 0 END) AS sun_total_dollar,
+            SUM(CASE WHEN currency_id = '005' THEN account_amount ELSE 0 END) AS sun_total_shikel,
+            SUM(CASE WHEN currency_id = '001' THEN account_amount ELSE 0 END) +
+            (SUM(CASE WHEN currency_id = '005' THEN account_amount ELSE 0 END) / 
+            (SELECT er.sell_rate FROM exchange_rates er WHERE er.currency_ex = '10100_10101' LIMIT 1)) AS total
+        FROM 
+            accounting a
+        WHERE 
+            a.account_type = 3100
+            AND a.currency_id IN ('001', '005')
+            AND a.Delete_Date IS NULL
+        LIMIT 0, 25;
+
+
+    ";
+
+    $stmt6 = $conn->prepare($query6);
+    $stmt6->execute();
+
+    $result6 = $stmt6->fetch(PDO::FETCH_ASSOC);
+    $total_in_usd_sub = $result6['sun_total_dollar'];
+    $total_in_shikel_sub = $result6['sun_total_shikel'];
+    $total_in_total_sub = $result6['total'];
+
 
 
 ?>
@@ -46,7 +118,7 @@ $total_customers = $stmt4->fetch(PDO::FETCH_ASSOC)['total_customers'];
         </span>
     </div>
 
-    <div class="row g-4">    
+    <div class="row g-4" data-permission="permission_23">    
 		<!-- بطاقة عدد المستخدمين -->
         <div class="col-xl-3 col-md-6">
                 <div class="card card-custom bg-light-primary card-stretch gutter-b shadow-sm">
@@ -71,18 +143,7 @@ $total_customers = $stmt4->fetch(PDO::FETCH_ASSOC)['total_customers'];
                     </div>
                 </div>
         </div>
-        <!-- بطاقة الرصيد المتوفر -->
-        <div class="col-xl-3 col-md-6">
-                <div class="card card-custom bg-light-warning card-stretch gutter-b shadow-sm">
-                    <div class="card-body">
-                        <span class="svg-icon svg-icon-3x svg-icon-warning">
-                            <i class="fas fa-wallet fs-2"></i>
-                        </span>
-                        <div class="text-dark font-weight-bold mt-3 fs-2">الرصيد المتوفر دولار</div>
-                        <div class="text-muted fs-3">$<?php echo number_format($total_balance, 2); ?></div>
-                    </div>
-                </div>
-        </div>
+        
         <!-- بطاقة عدد الزبائن -->
         <div class="col-xl-3 col-md-6">
                 <div class="card card-custom bg-light-danger card-stretch gutter-b shadow-sm">
@@ -95,11 +156,79 @@ $total_customers = $stmt4->fetch(PDO::FETCH_ASSOC)['total_customers'];
                     </div>
                 </div>
         </div>
+        <!-- بطاقة الرصيد المتوفر -->
+        <div class="col-xl-3 col-md-6" data-permission="permission_28">
+                <div class="card card-custom bg-light-warning card-stretch gutter-b shadow-sm" >
+                    <div class="card-body">
+                        <span class="svg-icon svg-icon-3x svg-icon-warning">
+                            <i class="fas fa-wallet fs-2"></i>
+                        </span>
+                        <div class="text-dark font-weight-bold mt-3 fs-2"> مجموع إيرادات دولار - فرعي</div>
+                        <div class="text-info fs-3">$<?php echo number_format($total_balance, 2); ?></div>
+                    </div>
+                </div>
+        </div>
     </div>
 
-    <div class="row g-4 mt-5"> <!-- g-4 لإضافة مسافات بين البطاقات -->
+    <div class="row g-4 mt-5" >    
+        <div class="col-xl-3 col-md-6" data-permission="permission_26">
+            <div class="card card-custom  card-stretch gutter-b shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <span class="svg-icon svg-icon-3x svg-icon-primary me-3">
+                            <i class="fas fa-dollar  text-success fs-2"></i>
+                        </span>
+                        <div class="text-dark font-weight-bold fs-4">مجموع دولار أمريكي رئيسي</div>
+                    </div>
+                    <div class="text-info fs-2 mt-3"><?php echo number_format($total_in_usd, 2); ?> $</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6" data-permission="permission_27">
+                <div class="card card-custom  card-stretch gutter-b shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <span class="svg-icon svg-icon-3x svg-icon-success me-3">
+                                <i class="fas fa-dollar  text-success fs-2"></i>
+                            </span>
+                            <div class="text-dark font-weight-bold mt-3 fs-4">مجموع دولار أمريكي - فرعي</div>
+                        </div>
+                        <div class="text-info fs-3 mt-3"><?php echo number_format($total_in_usd_sub, 2); ?>$</div>
+                    </div>
+                </div>
+        </div>
+        <div class="col-xl-3 col-md-6" data-permission="permission_27">
+                <div class="card card-custom  card-stretch gutter-b shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <span class="svg-icon svg-icon-3x svg-icon-success me-3">
+                                <i class="fas fa-wallet  text-success fs-2"></i>
+                            </span>
+                            <div class="text-dark font-weight-bold mt-3 fs-4">مجموع شيكل إسرائيلي - فرعي</div>
+                        </div>
+                        <div class="text-info fs-3 mt-3"><?php echo number_format($total_in_shikel_sub, 2); ?>	₪</div>
+                    </div>
+                </div>
+        </div>
+        <div class="col-xl-3 col-md-6" data-permission="permission_27">
+                <div class="card card-custom  card-stretch gutter-b shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <span class="svg-icon svg-icon-3x svg-icon-success me-3">
+                                <i class="fas fa-dollar  text-success fs-2"></i>
+                            </span>
+                            <div class="text-dark font-weight-bold mt-3 fs-4">مجموع فرعي - دولار أمريكي</div>
+                        </div>
+                        <div class="text-info  font-bold fs-3 mt-3"><?php echo number_format($total_in_total_sub, 2); ?>	$</div>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mt-5" data-permission="permission_24"> <!-- g-4 لإضافة مسافات بين البطاقات -->
         <!-- بطاقة تحويل العملة -->
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-4 col-md-6" data-permission="permission_2">
             <div class="card shadow-sm">
                 <a href="currency.php" class="text-decoration-none">
                     <div class="card-body text-center">
@@ -111,7 +240,7 @@ $total_customers = $stmt4->fetch(PDO::FETCH_ASSOC)['total_customers'];
             </div>
         </div>
         <!-- بطاقة إدارة الحسابات -->
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-4 col-md-6" data-permission="permission_3">
             <div class="card shadow-sm">
                 <a href="account.php" class="text-decoration-none">
                     <div class="card-body text-center">
@@ -123,7 +252,7 @@ $total_customers = $stmt4->fetch(PDO::FETCH_ASSOC)['total_customers'];
             </div>
         </div>
         <!-- بطاقة تحويلات وخدمات -->
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-4 col-md-6" data-permission="permission_5">
             <div class="card shadow-sm">
                 <a href="transfer.php" class="text-decoration-none">
                     <div class="card-body text-center">
@@ -135,7 +264,7 @@ $total_customers = $stmt4->fetch(PDO::FETCH_ASSOC)['total_customers'];
             </div>
         </div>
         <!-- بطاقة صناديق العملات -->
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-4 col-md-6" data-permission="permission_7">
             <div class="card shadow-sm">
                 <a href="fund.php" class="text-decoration-none">
                     <div class="card-body text-center">
@@ -147,7 +276,7 @@ $total_customers = $stmt4->fetch(PDO::FETCH_ASSOC)['total_customers'];
             </div>
         </div>
         <!-- بطاقة حسابات الزبائن -->
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-4 col-md-6" data-permission="permission_10">
             <div class="card shadow-sm">
                 <a href="customer.php" class="text-decoration-none">
                     <div class="card-body text-center">
@@ -159,7 +288,7 @@ $total_customers = $stmt4->fetch(PDO::FETCH_ASSOC)['total_customers'];
             </div>
         </div>
         <!-- بطاقة الموظفين -->
-        <div class="col-xl-4 col-md-6">
+        <div class="col-xl-4 col-md-6" data-permission="permission_11">
             <div class="card shadow-sm">
                 <a href="employees.php" class="text-decoration-none">
                     <div class="card-body text-center">

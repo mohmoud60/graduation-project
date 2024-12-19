@@ -1,6 +1,8 @@
 <?php
+$required_permission = 'permission_5';
 include 'session_check.php';
 include 'assets/php/connection.php';
+
 
 
 $query = $conn->prepare("SELECT * FROM currency");
@@ -115,7 +117,7 @@ $next_id = fetchNextId($conn, 'transfers', 'transfer_id');
 				<div class="d-flex align-items-center gap-2 gap-lg-3">
 					<!--begin::Secondary button-->
                     <a class="btn btn-info" id="serch_customer">البحث عن رصيد تاجر / زبون</a>
-                    <a class="btn fw-bold btn-info" data-bs-toggle="modal" data-bs-target="#recent_transfer_modal">عرض سجل التحويلات</a>
+                    <a class="btn fw-bold btn-info" data-bs-toggle="modal" data-bs-target="#recent_transfer_modal" data-permission="permission_22">عرض سجل التحويلات</a>
             
 
 					<!--end::Secondary button-->

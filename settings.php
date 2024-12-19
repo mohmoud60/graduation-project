@@ -1,7 +1,10 @@
 <?php
+$required_permission = 'permission_12';
 include 'session_check.php';
 // Include database connection file
 include 'assets/php/connection.php';
+
+
 
 // Query to get the data
 $sql = "SELECT * FROM company_info LIMIT 1"; // Change this query to match your needs

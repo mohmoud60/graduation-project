@@ -1,5 +1,5 @@
 <?php
-
+$required_permission = 'permission_10';
 include 'session_check.php';
 // Include database connection file
 include 'assets/php/connection.php';

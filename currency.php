@@ -1,4 +1,5 @@
 <?php
+$required_permission = 'permission_2';
 include 'session_check.php';
 include 'assets/php/connection.php';
 
@@ -45,11 +46,11 @@ $main_currency = $query->fetchAll(PDO::FETCH_ASSOC);
 				<!--begin::Actions-->
 				<div class="d-flex align-items-center gap-2 gap-lg-3">
 					<!--begin::Secondary button-->
-					<a class="btn fw-bold btn-info" data-bs-toggle="modal" data-bs-target="#exupdateModal">تحديث أسعار الصرف</a>
+					<a class="btn fw-bold btn-info" data-bs-toggle="modal" data-bs-target="#exupdateModal" data-permission="permission_20">تحديث أسعار الصرف</a>
 
 					<!--end::Secondary button-->
 					<!--begin::Primary button-->
-                    <a class="btn fw-bold btn-info" data-bs-toggle="modal" data-bs-target="#returnModal">إرجاع فاتورة</a>
+                    <a class="btn fw-bold btn-info" data-bs-toggle="modal" data-bs-target="#returnModal" data-permission="permission_21">إرجاع فاتورة</a>
 					<!--end::Primary button-->
 				</div>
 				<!--end::Actions-->

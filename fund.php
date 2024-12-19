@@ -1,5 +1,6 @@
 <?php
 
+$required_permission = 'permission_7';
 
 include 'session_check.php';
 include 'assets/php/connection.php';
@@ -111,59 +112,31 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en" direction="rtl" dir="rtl" style="direction: rtl">
-	<!--begin::Head-->
     <?php include 'head.php'; ?>
-	<!--end::Head-->
-	<!--begin::Body-->
-	<body id="kt_app_body" data-kt-app-layout="dark-sidebar" data-kt-app-header-fixed="true" data-kt-app-sidebar-enabled="true" data-kt-app-sidebar-fixed="true" data-kt-app-sidebar-hoverable="true" data-kt-app-sidebar-push-header="true" data-kt-app-sidebar-push-toolbar="true" data-kt-app-sidebar-push-footer="true" data-kt-app-toolbar-enabled="true" class="app-default">
-    <?php include 'header.php'; ?>
-    <?php include 'sidebar.php'; ?>
-					<!--begin::Main-->
-				<!--begin::Main-->
-<div class="app-main flex-column flex-row-fluid" id="kt_app_main">
-    <div class="d-flex flex-column flex-column-fluid">
-        <!--begin::Toolbar-->
-        <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
-            <!--begin::Toolbar container-->
-    			<div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
-    				<!--begin::Page title-->
+
+    <body id="kt_app_body" data-kt-app-layout="dark-sidebar" data-kt-app-header-fixed="true" data-kt-app-sidebar-enabled="true" data-kt-app-sidebar-fixed="true" data-kt-app-sidebar-hoverable="true" data-kt-app-sidebar-push-header="true" data-kt-app-sidebar-push-toolbar="true" data-kt-app-sidebar-push-footer="true" data-kt-app-toolbar-enabled="true" class="app-default">
+        <?php include 'header.php'; ?>
+        <?php include 'sidebar.php'; ?>
+
+        <div class="app-main flex-column flex-row-fluid" id="kt_app_main">
+            <div class="d-flex flex-column flex-column-fluid">
+                <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+            		<div id="kt_app_toolbar_container" class="app-container container-xxl d-flex flex-stack">
     				<div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-    					<!--begin::Title-->
-    					<!--begin::Underline-->
-                            <span class="d-inline-block position-relative ms-2">
-                            <!--begin::Label-->
-                                <span class="d-inline-block mb-2 fs-2tx fw-bold" id="page_titel">
-                                  صناديق العملات 
-                                </span>
-                            <!--end::Label-->
-
-                            <!--begin::Line-->
-                                <span class="d-inline-block position-absolute h-3px bottom-0 end-0 start-0 bg-success translate rounded"></span>
-                            <!--end::Line-->
-                                     </span>
-                        <!--end::Underline-->
-                        </div>
-    				<!--end::Page title-->
-            <?php if ($_SESSION['role'] === 'Admin'  || $_SESSION['role'] === 'Accounting'): ?>
-                    <!--begin::Actions-->
-				<div class="d-flex align-items-center gap-2 gap-lg-3">
-					<!--begin::Secondary button-->
-					<a class="btn fw-bold btn-info" data-bs-toggle="modal" data-bs-target="#updateIncomeModal">ترحيل إيرادات</a>
-					<!--end::Secondary button-->
-				
-				</div>
-				<!--end::Actions-->
-        <?php endif; ?>
-    			</div>
-    			<!--end::Toolbar container-->
+                        <span class="d-inline-block position-relative ms-2">
+                        <span class="d-inline-block mb-2 fs-2tx fw-bold" id="page_titel">صناديق العملات </span>
+                        <span class="d-inline-block position-absolute h-3px bottom-0 end-0 start-0 bg-success translate rounded"></span></span>
+                    </div>
+				    <div class="d-flex align-items-center gap-2 gap-lg-3">
+					    <a class="btn fw-bold btn-info" data-bs-toggle="modal" data-bs-target="#updateIncomeModal" data-permission="permission_19">ترحيل إيرادات</a>
+				    </div>
+            		</div>
+                </div>
+            </div>
         </div>
-
-
-    
-    <div class="container py-2">
-    <?php if ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'accountant' || $_SESSION['role'] === 'Accounting'): ?>
-    <h1 class="mt-5 d-flex align-items-center justify-content-center  mb-5">صناديق النقد الرئيسية</h1>
-    <div class="row">
+        <div class="container py-2" >
+        <div class="row"  data-permission="permission_15">
+        <h1 class="mt-5 d-flex align-items-center justify-content-center  mb-5">صناديق النقد الرئيسية</h1>
         <?php foreach ($result_main as $row): ?>
         <div class="col-md-3">
             <div class="card mb-3">
@@ -181,11 +154,9 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
         <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
-    <?php if ($_SESSION['role'] === 'Admin' || $_SESSION['role'] === 'service' || $_SESSION['role'] === 'Accounting'): ?>
-    <h1 class="mt-5 d-flex align-items-center justify-content-center mb-5">صناديق النقد الفرعية</h1>
-    <div class="row">
+        </div>
+        <div class="row" data-permission="permission_16">
+        <h1 class="mt-5 d-flex align-items-center justify-content-center mb-5">صناديق النقد الفرعية</h1>
         <?php foreach ($result_sub as $row): ?>
             <!-- Only display if account_amount is greater than 0 -->
             <?php if ($row['account_amount'] != 0): ?>
@@ -206,214 +177,176 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             <?php endif; ?>
         <?php endforeach; ?>
-		
-        <h1 class="mt-5 d-flex align-items-center justify-content-center mb-5">صناديق إيرادات</h1>
-    <div class="row">
-        <?php foreach ($result_income as $row): ?>
-            <!-- Only display if account_amount is greater than 0 -->
-            <?php if ($row['account_amount'] != 0): ?>
-                <div class="col-md-3">
+        </div>
+        <div class="row" data-permission="permission_17">
+            <h1 class="mt-5 d-flex align-items-center justify-content-center mb-5">صناديق إيرادات</h1>
+            <?php foreach ($result_income as $row): ?>
+                <?php if ($row['account_amount'] != 0): ?>
+                    <div class="col-md-3">
+                        <div class="card mb-3">
+                            <div class="card-header d-flex align-items-center justify-content-center">
+                                <h5 class="card-title fw-bold"><?php echo htmlspecialchars($row['account_Sname']); ?></h5>
+                            </div>
+                            <div class="card-body">
+                                <!--begin::Input group-->
+                                <div class="input-group mb-5">
+                                    <span class="input-group-text  fs-1"><?php echo htmlspecialchars($row['currency_symbole']); ?></span>
+                                    <input type="text" class="form-control text-center fs-1 fw-bold text-success" value="<?php echo number_format($row['account_amount'], 2, '.', ','); ?>" aria-label="Amount" readonly/>
+                                </div>
+                                <!--end::Input group-->
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+            <div class="row" >
+                <h1 class="mt-5 d-flex align-items-center justify-content-center mb-5">إجمالي الإيرادات</h1>
+                <?php foreach ($results as $row): ?>
+                    <?php if ($row['total_amount'] != 0): ?>
+                        <div class="col-md-3">
+                            <div class="card mb-3">
+                                <div class="card-header d-flex align-items-center justify-content-center">
+                                    <h5 class="card-title fw-bold"> اجمالي إيراد <?php echo htmlspecialchars($row['currency_sname']); ?></h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="input-group mb-5 income_total">
+                                        <span class="input-group-text  fs-1"><?php echo htmlspecialchars($row['currency_symbole']); ?></span>
+                                        <input type="text" class="form-control text-center fs-1 fw-bold text-success" value="<?php echo number_format($row['total_amount'], 2, '.', ','); ?>" aria-label="Amount" readonly/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <div class="row" data-permission="permission_18">
+            <h1 class="mt-5 d-flex align-items-center justify-content-center mb-5">إجمالي حسابات علينا - لنا</h1>
+            <?php foreach ($total_balances as $balance_info): ?>
+                <?php 
+                    $currency_sname = $balance_info['currency_sname'];
+                    $currency_symbole = $balance_info['currency_symbole'];
+                    $total_deposit = number_format($balance_info['total_deposit'], 2);
+                    $total_withdraw = number_format($balance_info['total_withdraw'], 2);
+                    if ($total_deposit == 0.00 && $total_withdraw == 0.00) {
+                        continue;
+                    }
+                ?>
+                <div class="col-md-4">
                     <div class="card mb-3">
                         <div class="card-header d-flex align-items-center justify-content-center">
-                            <h5 class="card-title fw-bold"><?php echo htmlspecialchars($row['account_Sname']); ?></h5>
+                            <h5 class="card-title fw-bold"><?= htmlspecialchars($currency_sname) ?></h5>
                         </div>
                         <div class="card-body">
                             <!--begin::Input group-->
                             <div class="input-group mb-5">
-                                <span class="input-group-text  fs-1"><?php echo htmlspecialchars($row['currency_symbole']); ?></span>
-                                <input type="text" class="form-control text-center fs-1 fw-bold text-success" value="<?php echo number_format($row['account_amount'], 2, '.', ','); ?>" aria-label="Amount" readonly/>
+                                <span class="input-group-text fs-1"><?= $currency_symbole ?></span>
+                                <input type="text" class="form-control text-center fs-1 fw-bold text-success" value="<?= $total_deposit . ' علينا' ?>" aria-label="Amount" readonly/>
+                            </div>
+                            <div class="input-group mb-5">
+                                <span class="input-group-text fs-1"><?= $currency_symbole ?></span>
+                                <input type="text" class="form-control text-center fs-1 fw-bold text-danger" value="<?= $total_withdraw . ' لنا' ?>" aria-label="Amount" readonly/>
                             </div>
                             <!--end::Input group-->
                         </div>
                     </div>
                 </div>
-            <?php endif; ?>
-        <?php endforeach; ?>
-        <h1 class="mt-5 d-flex align-items-center justify-content-center mb-5">إجمالي الإيرادات</h1>
-        <div class="row">
-        <?php foreach ($results as $row): ?>
-            <!-- Only display if account_amount is greater than 0 -->
-            <?php if ($row['total_amount'] != 0): ?>
-                <div class="col-md-3">
-                    <div class="card mb-3">
-                        <div class="card-header d-flex align-items-center justify-content-center">
-                            <h5 class="card-title fw-bold"> اجمالي إيراد <?php echo htmlspecialchars($row['currency_sname']); ?></h5>
-                        </div>
-                        <div class="card-body">
-                            <!--begin::Input group-->
-                            <div class="input-group mb-5 income_total">
-                                <span class="input-group-text  fs-1"><?php echo htmlspecialchars($row['currency_symbole']); ?></span>
-                                <input type="text" class="form-control text-center fs-1 fw-bold text-success" value="<?php echo number_format($row['total_amount'], 2, '.', ','); ?>" aria-label="Amount" readonly/>
+            <?php endforeach; ?>
+        </div>
+        </div>
+        <div class="modal fade" id="updateIncomeModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered mw-650px">
+                <div class="modal-content">
+                    <form class="form" action="#" id="updateIncomeModal_form" data-kt-redirect="fund.php">
+                        <div class="modal-header d-flex justify-content-between align-items-center" id="updateIncomeModal_header">
+                            <h2 class="fw-bold m-auto">ترحيل إيرادات</h2>
+                            <div id="updateIncomeModal_close" class="btn btn-icon btn-sm btn-active-light-primary" data-bs-dismiss="modal" aria-label="Close">
+                                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
                             </div>
-                            <!--end::Input group-->
                         </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-        <?php endforeach; ?>
-        
-		
-        <div class="container">
-    <h1 class="mt-5 d-flex align-items-center justify-content-center mb-5">إجمالي حسابات علينا - لنا</h1>
-    <div class="row">
-        <?php foreach ($total_balances as $balance_info): ?>
-            <?php 
-                $currency_sname = $balance_info['currency_sname'];
-                $currency_symbole = $balance_info['currency_symbole'];
-                $total_deposit = number_format($balance_info['total_deposit'], 2);
-                $total_withdraw = number_format($balance_info['total_withdraw'], 2);
-                if ($total_deposit == 0.00 && $total_withdraw == 0.00) {
-                    continue;
-                }
-            ?>
-            <div class="col-md-4">
-                <div class="card mb-3">
-                    <div class="card-header d-flex align-items-center justify-content-center">
-                        <h5 class="card-title fw-bold"><?= htmlspecialchars($currency_sname) ?></h5>
-                    </div>
-                    <div class="card-body">
-                        <!--begin::Input group-->
-                        <div class="input-group mb-5">
-                            <span class="input-group-text fs-1"><?= $currency_symbole ?></span>
-                            <input type="text" class="form-control text-center fs-1 fw-bold text-success" value="<?= $total_deposit . ' علينا' ?>" aria-label="Amount" readonly/>
+                        <div class="modal-body py-10 px-lg-17">
+                            <div class="scroll-y me-n7 pe-7" id="updateIncomeModal_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#updateIncomeModal_header" data-kt-scroll-wrappers="#updateIncomeModal_scroll" data-kt-scroll-offset="300px">
+                                <h2>  اجمالي إيرادات </h2>
+                                <div class="mb-3" id="total">
+                                    <?php foreach ($results as $row): ?>
+                                        <?php if ($row['total_amount'] != 0): ?>
+                                            <div class="my-3">
+                                                <p class="fs-1 fw-bold" id="sum_total">
+                                                  <?php echo htmlspecialchars($row['currency_sname']); ?>: <span class="text-success"><?php echo htmlspecialchars($row['currency_symbole']); ?> <?php echo number_format($row['total_amount'], 2, '.', ','); ?></span>
+                                                </p>
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <div class="modal-footer flex-center">
+                                <button type="reset" id="updateIncomeModal_cancel" class="btn btn-light me-3">إلغاء</button>
+                                <button type="submit" id="updateIncomeModal_submit" class="btn btn-primary">
+                                    <span class="indicator-label">ترحيل</span>
+                                    <span class="indicator-progress">انتظر من فضلك...
+                                        <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
+                                </button>
+                            </div>
                         </div>
-                        <div class="input-group mb-5">
-                            <span class="input-group-text fs-1"><?= $currency_symbole ?></span>
-                            <input type="text" class="form-control text-center fs-1 fw-bold text-danger" value="<?= $total_withdraw . ' لنا' ?>" aria-label="Amount" readonly/>
-                        </div>
-                        <!--end::Input group-->
-                    </div>
+                    </form>
                 </div>
             </div>
-        <?php endforeach; ?>
-    </div>
-</div>
-
-    </div>
-</div>
-<?php endif; ?>
-					<!--end:::Main-->
-
-<!--begin::Modal - fund - Add-->
-<div class="modal fade" id="updateIncomeModal" tabindex="-1" aria-hidden="true">
-    <!--begin::Modal dialog-->
-    <div class="modal-dialog modal-dialog-centered mw-650px">
-        <!--begin::Modal content-->
-        <div class="modal-content">
-            <!--begin::Form-->
-            <form class="form" action="#" id="updateIncomeModal_form" data-kt-redirect="fund.php">
-                <!--begin::Modal header-->
-                <div class="modal-header d-flex justify-content-between align-items-center" id="updateIncomeModal_header">
-                    <!--begin::Modal title-->
-                    <h2 class="fw-bold m-auto">ترحيل إيرادات</h2>
-                    <!--end::Modal title-->
-                    <!--begin::Close-->
-                    <div id="updateIncomeModal_close" class="btn btn-icon btn-sm btn-active-light-primary" data-bs-dismiss="modal" aria-label="Close">
-                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
-                    </div>
-                    <!--end::Close-->
-                </div>
-                <!--end::Modal header-->
-                <!--begin::Modal body-->
-                <div class="modal-body py-10 px-lg-17">
-                <!--begin::Scroll-->
-                <div class="scroll-y me-n7 pe-7" id="updateIncomeModal_scroll" data-kt-scroll="true" data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#updateIncomeModal_header" data-kt-scroll-wrappers="#updateIncomeModal_scroll" data-kt-scroll-offset="300px">
-                <h2>  اجمالي إيرادات </h2>
-                <div class="mb-3" id="total">
-                            <?php foreach ($results as $row): ?>
-                                <!-- Only display if account_amount is greater than 0 -->
-                                <?php if ($row['total_amount'] != 0): ?>
-                                    <div class="my-3">
-                                        <p class="fs-1 fw-bold" id="sum_total">
-                                          <?php echo htmlspecialchars($row['currency_sname']); ?>: <span class="text-success"><?php echo htmlspecialchars($row['currency_symbole']); ?> <?php echo number_format($row['total_amount'], 2, '.', ','); ?></span>
-                                        </p>
-                                    </div>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                    </div>
-                <!--end::Scroll-->
-                </div>
-                <!--end::Modal body-->
-                <!--begin::Modal footer-->
-                <div class="modal-footer flex-center">
-                    <!--begin::Button-->
-                    <button type="reset" id="updateIncomeModal_cancel" class="btn btn-light me-3">إلغاء</button>
-                    <!--end::Button-->
-                    <!--begin::Button-->
-                    <button type="submit" id="updateIncomeModal_submit" class="btn btn-primary">
-                        <span class="indicator-label">ترحيل</span>
-                        <span class="indicator-progress">انتظر من فضلك...
-                            <span class="spinner-border spinner-border-sm align-middle ms-2"></span></span>
-                    </button>
-                    <!--end::Button-->
-                </div>
-                <!--end::Modal footer-->
-            </form>
-            <!--end::Form-->
         </div>
-    </div>
-</div>
-<!--end::Modal - fund - Add-->
-<iframe id="print_frame" name="print_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe>
-
-
-<!-- income Confirm Modal -->
-<div class="modal fade" id="incomeConfirmModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">تأكيد ترحيل الإيرادات</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="incomeConfirmForm">
-          <label for="usd " class="fw-bold mb-2">ترحيل دولار أمريكي</label>
-          <div class="input-group mb-5">
-            <span class="input-group-text  fs-1">$</span>
-            <input id="usd" type="number" class="form-control text-center fs-1 fw-bold " value="">
+        <div class="modal fade" id="incomeConfirmModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">تأكيد ترحيل الإيرادات</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="incomeConfirmForm">
+                  <label for="usd " class="fw-bold mb-2">ترحيل دولار أمريكي</label>
+                  <div class="input-group mb-5">
+                    <span class="input-group-text  fs-1">$</span>
+                    <input id="usd" type="number" class="form-control text-center fs-1 fw-bold " value="">
+                  </div>
+                  <label for="ils " class="fw-bold mb-2">ترحيل  شيكل إسرائيلي</label>
+                  <div class="input-group mb-5">
+                    <span class="input-group-text  fs-1">₪</span>
+                    <input id="ils" type="number" class="form-control text-center fs-1 fw-bold " value="">
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-danger confirm-income-btn">تأكيد</button>
+              </div>
+            </div>
           </div>
-          <label for="ils " class="fw-bold mb-2">ترحيل  شيكل إسرائيلي</label>
-          <div class="input-group mb-5">
-            <span class="input-group-text  fs-1">₪</span>
-            <input id="ils" type="number" class="form-control text-center fs-1 fw-bold " value="">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
-        <button type="button" class="btn btn-danger confirm-income-btn">تأكيد</button>
-      </div>
-    </div>
-  </div>
-</div>
+        </div>
 
+        <iframe id="print_frame" name="print_frame" width="0" height="0" frameborder="0" src="about:blank"></iframe>
 
-
-		<!--begin::Javascript-->
-		<script>var hostUrl = "assets/";</script>
-		<!--begin::Global Javascript Bundle(mandatory for all pages)-->
-		<script src="assets/plugins/global/plugins.bundle.js"></script>
-		<script src="assets/js/scripts.bundle.js"></script>
-		<!--end::Global Javascript Bundle-->
-		<!--begin::Vendors Javascript(used for this page only)-->
-		<script src="assets/plugins/custom/datatables/datatables.bundle.js"></script>
-		<script src="assets/plugins/custom/vis-timeline/vis-timeline.bundle.js"></script>
+	    <!--begin::Javascript-->
+	    <script>var hostUrl = "assets/";</script>
+	    <!--begin::Global Javascript Bundle(mandatory for all pages)-->
+	    <script src="assets/plugins/global/plugins.bundle.js"></script>
+	    <script src="assets/js/scripts.bundle.js"></script>
+	    <!--end::Global Javascript Bundle-->
+	    <!--begin::Vendors Javascript(used for this page only)-->
+	    <script src="assets/plugins/custom/datatables/datatables.bundle.js"></script>
+	    <script src="assets/plugins/custom/vis-timeline/vis-timeline.bundle.js"></script>
         <script src="assets/js/js/fund/update_income.js"></script>
-		<!--end::Vendors Javascript-->
-		<!--begin::Custom Javascript(used for this page only)-->
-		<script src="assets/js/widgets.bundle.js"></script>
-		<script src="assets/js/custom/widgets.js"></script>
-		<script src="assets/js/custom/apps/chat/chat.js"></script>
-		<script src="assets/js/custom/utilities/modals/upgrade-plan.js"></script>
-		<script src="assets/js/custom/utilities/modals/new-target.js"></script>
-		<script src="assets/js/custom/utilities/modals/users-search.js"></script>
-		<!--end::Custom Javascript-->
-		<script src="assets/js/js/employee_over.js"></script>
-		<!--end::Javascript-->
+	    <!--end::Vendors Javascript-->
+	    <!--begin::Custom Javascript(used for this page only)-->
+	    <script src="assets/js/widgets.bundle.js"></script>
+	    <script src="assets/js/custom/widgets.js"></script>
+	    <script src="assets/js/custom/apps/chat/chat.js"></script>
+	    <script src="assets/js/custom/utilities/modals/upgrade-plan.js"></script>
+	    <script src="assets/js/custom/utilities/modals/new-target.js"></script>
+	    <script src="assets/js/custom/utilities/modals/users-search.js"></script>
+	    <!--end::Custom Javascript-->
+	    <script src="assets/js/js/employee_over.js"></script>
+	    <!--end::Javascript-->
         <script>
             var createdBy = '<?php echo $_SESSION["username"]; ?>';
-
             </script>
-	</body>
+    </body>
 	<!--end::Body-->
 </html>

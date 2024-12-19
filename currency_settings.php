@@ -1,5 +1,8 @@
 <?php
 include 'session_check.php';
+
+$required_permission = 'permission_4';
+
 if (isset($_SESSION['role'])) {
     echo "<script>
             localStorage.setItem('userRole', '" . $_SESSION['role'] . "');

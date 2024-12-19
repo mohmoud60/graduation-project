@@ -1,5 +1,6 @@
 <?php
 
+$required_permission = 'permission_9';
 include 'session_check.php';
 
 ?>

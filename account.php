@@ -1,6 +1,6 @@
 <?php
+$required_permission = 'permission_3';
 include 'session_check.php';
-
 include 'assets/php/connection.php';
 $query = $conn->prepare("SELECT * FROM currency");
 $query->execute();

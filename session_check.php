@@ -1,27 +1,33 @@
 <?php
 session_start();
 
-// Check if "last_activity" is set in $_SESSION
+// التحقق من وقت النشاط الأخير (انتهاء الجلسة)
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > 1800) {
-    // Last request was more than 10 minutes ago (600 seconds)
-    // This will unset $_SESSION variable
+    // آخر طلب كان منذ أكثر من 30 دقيقة
     session_unset(); 
-
-    // This will destroy the session data
     session_destroy(); 
-
-    // Redirect the user to login page
     header("Location: index.php");
     exit();
-} 
+}
 
-// Check if user_id is set in $_SESSION
+// التحقق من تسجيل الدخول
 if (!isset($_SESSION['user_id'])) {
-    // Redirect the user to login page
     header("Location: index.php");
     exit();
 } else {
-    // Update last activity time stamp
+    // تحديث وقت النشاط الأخير
     $_SESSION['last_activity'] = time();
 }
+
+// التحقق من الصلاحيات للدخول إلى الصفحة الحالية
+if (isset($required_permissions)) { // التحقق من وجود قائمة الصلاحيات
+    if (!isset($_SESSION['permissions']) || !array_intersect($required_permissions, $_SESSION['permissions'])) {
+        // إذا لم تتطابق أي صلاحية، إعادة التوجيه إلى صفحة "غير متاح"
+        header("Location: unavailable.php");
+        exit();
+    }
+}
+
+
+
 ?>

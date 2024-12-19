@@ -37,7 +37,7 @@ if ($action === "get_contact") {
         // التحقق من وجود معرّف الموظف في المتغيرات الجلسية
         if (isset($_SESSION['employee_id'])) {
             $employeeId = $_SESSION['employee_id'];
-            $stmt = $conn->prepare("SELECT Employee_id, Employee_FullName, Employee_Email, avatar_path FROM employee WHERE Employee_id != :employeeId AND Delete_Date IS NULL");
+            $stmt = $conn->prepare("SELECT Employee_id, Employee_FullName, Employee_Email, avatar_path ,role_id FROM employee WHERE Employee_id != :employeeId AND Delete_Date IS NULL");
             $stmt->bindParam(':employeeId', $employeeId, PDO::PARAM_INT);
             $stmt->execute();
             $response = $stmt->fetchAll(PDO::FETCH_ASSOC);

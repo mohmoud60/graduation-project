@@ -128,8 +128,11 @@ var KTUsersList = function () {
                             render: function (data) {
                                 return `
                                     <td class="text-end">
-                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_add_user">
-                                            <i class=" fs-1"></i>تحديث صلاحيات
+                                        <button type="button" class="btn btn-primary" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#kt_modal_add_user" 
+                                            onclick="loadUserRole(${data})">
+                                            تحديث صلاحيات
                                         </button>
                                     </td>`;
                             }
@@ -156,3 +159,114 @@ var KTUsersList = function () {
 KTUtil.onDOMContentLoaded((function () {
     KTUsersList.init()
 }));
+
+
+function loadUserRole(employeeId) {
+    const modal = document.querySelector("#kt_modal_add_user");
+    modal.setAttribute("data-employee-id", employeeId); // تخزين Employee_id في المودال
+
+    const userNameInput = modal.querySelector("input[name='user_name']");
+    const roleOptionsContainer = modal.querySelector("#role_options_container");
+
+    // استدعاء API للحصول على الصلاحيات
+    fetch(`assets/php/users_rols.php?action=get_user_role_per&employee_id=${employeeId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // تعبئة اسم المستخدم
+                userNameInput.value = data.user_name;
+
+                // إنشاء الخيارات ديناميكيًا
+                let roleOptionsHTML = '';
+                data.roles.forEach(role => {
+                    const isChecked = role.assigned === "1" ? "checked" : ""; // تحقق صحيح من القيمة
+                    roleOptionsHTML += `
+                        <div class="d-flex fv-row mb-5">
+                            <div class="form-check form-check-custom form-check-solid">
+                                <input class="form-check-input me-3" name="user_role" type="radio" value="${role.id}" 
+                                    id="role_option_${role.id}" ${isChecked} />
+                                <label class="form-check-label" for="role_option_${role.id}">
+                                    <div class="fw-bold text-gray-800">${role.description}</div>
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                roleOptionsContainer.innerHTML = roleOptionsHTML;
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "خطأ",
+                    text: "حدث خطأ أثناء تحميل بيانات الصلاحيات.",
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching user role permissions:", error);
+            Swal.fire({
+                icon: "error",
+                title: "خطأ",
+                text: "حدث خطأ أثناء الاتصال بالخادم.",
+            });
+        });
+}
+
+
+
+document.querySelector("#kt_modal_add_user_form").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const modal = document.querySelector("#kt_modal_add_user");
+    const employeeId = modal.getAttribute("data-employee-id"); // الحصول على Employee_id
+    const selectedRole = document.querySelector("input[name='user_role']:checked").value;
+
+    if (!employeeId || !selectedRole) {
+        Swal.fire({
+            icon: "warning",
+            title: "تحذير",
+            text: "يرجى تحديد صلاحية للمستخدم.",
+        });
+        return;
+    }
+
+    const updatedData = {
+        employee_id: employeeId,
+        role_id: selectedRole,
+    };
+
+    fetch("assets/php/users_rols.php?action=update_user_role", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "نجاح",
+                    text: "تم تحديث صلاحيات المستخدم بنجاح!",
+                }).then(() => {
+                    location.reload(); // إعادة تحميل الصفحة بعد إغلاق التنبيه
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "خطأ",
+                    text: "خطأ أثناء تحديث الصلاحيات: " + data.message,
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error updating user role:", error);
+            Swal.fire({
+                icon: "error",
+                title: "خطأ",
+                text: "حدث خطأ أثناء الاتصال بالخادم.",
+            });
+        });
+});
+

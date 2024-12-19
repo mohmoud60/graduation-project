@@ -52,4 +52,32 @@ $(document).ready(function() {
     
 });
 
+fetch("assets/php/users_rols.php?action=get_user_role_permissions")
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // جمع جميع الصلاحيات من الدور المخصص فقط
+            const userPermissions = data.roles[0].permissions.split(',');
+
+            // تحديث الـ Sidebar بناءً على الصلاحيات
+            updateSidebar(userPermissions);
+        } else {
+            console.error("Error fetching permissions:", data.message);
+        }
+    })
+    .catch(error => console.error("Error fetching permissions:", error));
+
+
+// تحديث Sidebar بناءً على الصلاحيات
+function updateSidebar(permissions) {
+    const sidebarItems = document.querySelectorAll("[data-permission]");
+
+    sidebarItems.forEach(item => {
+        const requiredPermission = item.getAttribute("data-permission");
+        if (!permissions.includes(requiredPermission)) {
+            item.style.display = "none"; // إخفاء العنصر إذا لم تكن الصلاحية متوفرة
+        }
+    });
+}
+
 

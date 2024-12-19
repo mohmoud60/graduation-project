@@ -1,10 +1,12 @@
 <?php
+$required_permission = 'permission_4';
 include 'session_check.php';
 if (isset($_SESSION['role'])) {
     echo "<script>
             localStorage.setItem('userRole', '" . $_SESSION['role'] . "');
           </script>";
 }
+
 
 include 'assets/php/connection.php';
 $query = $conn->prepare("SELECT * FROM accounting WHERE account_type = 3000");
@@ -97,11 +99,9 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 																	<span class="path4"></span>
 																	<span class="path5"></span>
 																</i>طباعة</a>
-																<?php if ($_SESSION['role'] === 'Admin'): ?>
 													<!--begin::Add -->
-													<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#add_mainTable">أضف فئة عملات جديد</button>
+													<button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#add_mainTable" data-permission="permission_25">أضف فئة عملات جديد</button>
 													<!--end::Add -->
-													<?php endif; ?>
 													<!--begin::Add -->
 													<a href="edit_exchange.php" class="btn btn-primary">تعديل أسعار الصرف</a>
 													<!--end::Add -->
@@ -121,36 +121,36 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 										<!-- -->
 										<div class="card mt-5 d-none">
-        <div class="card-body">
-        <form action="" method="POST">
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <h2>سعر الشراء</h2>
-                    </div>
-                    <div class="col-md-4" >
-                        <h2>سعر البيع</h2>
-                    </div>
-                </div>
+									    <div class="card-body">
+									        <form action="" method="POST">
+									                <div class="row mb-3">
+									                    <div class="col-md-4">
+									                        <h2>سعر الشراء</h2>
+									                    </div>
+									                    <div class="col-md-4" >
+									                        <h2>سعر البيع</h2>
+									                    </div>
+									                </div>
 
-                <?php
-                // عرض الخانات بناءً على البيانات المحصلة
-                foreach($results as $row) {
-                    ?>
-                    <div class="row form-group mb-3">
-                        <div class="col-md-4"  id="buy_rate">
-                            <input readonly type="text" class="form-control fs-3" id="buy_rate_<?= $row['currency_ex']; ?>" name="buy_rate_<?= $row['currency_ex']; ?>" value="<?= $row['buy_rate']; ?>" placeholder="سعر الشراء">
-                        </div>
-                        <div class="col-md-4" id="sell_rate">
-                            <input  readonly type="text" class="form-control fs-3" id="sell_rate_<?= $row['currency_ex']; ?>" name="sell_rate_<?= $row['currency_ex']; ?>" value="<?= $row['sell_rate']; ?>" placeholder="سعر البيع">
-                        </div>
-                    </div>
-                    <?php
-                }
-                ?>
-            </form>
-        </div>
-    </div>
-	<!-- -->
+									                <?php
+									                // عرض الخانات بناءً على البيانات المحصلة
+									                foreach($results as $row) {
+									                    ?>
+									                    <div class="row form-group mb-3">
+									                        <div class="col-md-4"  id="buy_rate">
+									                            <input readonly type="text" class="form-control fs-3" id="buy_rate_<?= $row['currency_ex']; ?>" name="buy_rate_<?= $row['currency_ex']; ?>" value="<?= $row['buy_rate']; ?>" placeholder="سعر الشراء">
+									                        </div>
+									                        <div class="col-md-4" id="sell_rate">
+									                            <input  readonly type="text" class="form-control fs-3" id="sell_rate_<?= $row['currency_ex']; ?>" name="sell_rate_<?= $row['currency_ex']; ?>" value="<?= $row['sell_rate']; ?>" placeholder="سعر البيع">
+									                        </div>
+									                    </div>
+									                    <?php
+									                }
+									                ?>
+									            </form>
+									        </div>
+									    </div>
+										<!-- -->
 										<!--begin::Card body-->
 										<div class="card-body pt-0">
 											<!--begin::Table-->
